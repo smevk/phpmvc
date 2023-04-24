@@ -1,0 +1,17 @@
+{
+    "name": "php/mvc",
+    "description": "php mvc model",
+    "require": {
+        "php": "^8.2"
+    },
+    "autoload": {
+        "psr-4": {
+            "Php\\Mvc\\":""
+        }
+    },
+    "authors": [
+        {
+            "name": "Kashif Khan"
+        }
+    ]
+}
