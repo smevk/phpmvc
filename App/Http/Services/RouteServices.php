@@ -42,21 +42,21 @@ class RouteServices {
 
     public static function processRequestFormInputAndQueryParams($request,$matches,$queryParams){
         // setting wildcards as properties
-        foreach ($matches as $key => $value) {
-            // if (is_string($key)) {
-                $request->setAttribute($key, $value);
-                // making propetires out of wild card
-                // $request->$key = $value;
-
-            // }
-        //setting query params as properties on requset 
-        //  foreach($queryParams as $key => $value){
-        //     // if(is_string($key)){
+        // foreach ($matches as $key => $value) {
+        //     // if (is_string($key)) {
         //         $request->setAttribute($key, $value);
+        //         // making propetires out of wild card
         //         // $request->$key = $value;
+
         //     // }
-        //  }   
-        }
+        // //setting query params as properties on requset 
+        // //  foreach($queryParams as $key => $value){
+        // //     // if(is_string($key)){
+        // //         $request->setAttribute($key, $value);
+        // //         // $request->$key = $value;
+        // //     // }
+        // //  }   
+        // }
 
         // if method is post. catching form inputs to proeprties in request class;
         // setting post data as requset params

@@ -12,13 +12,14 @@ class SetRequestData implements Middleware {
         $this->setFormInput($request);
         $this->setFormFilesUpload($request);
         $this->queryParams($request);
-        return $response;   
+        // passign updated request and response
+        return [$request,$response];  
 
     }
 
     public function setFormInput($request){
-        if (isset($_POST)) {
-            $requestData = $_POST;
+        if (!empty($request->POST)) {
+            $requestData = $request->POST;
 
             // if request is json then we will encode it to json
             if(UrlParser::$contentType === 'application/json'){
@@ -46,8 +47,8 @@ class SetRequestData implements Middleware {
 
     public function setFormFilesUpload($request){
 
-        if (isset($_FILES)) {
-            foreach ($_FILES as $key => $value) {
+        if (!empty($request->requestFiles())) {
+            foreach ($request->requestFiles() as $key => $value) {
                 if (is_array($value['name'])) {
                     $filesArray = [];
                     $filesCount = count($value['name']);

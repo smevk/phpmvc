@@ -8,33 +8,36 @@ use Php\Mvc\App\Http\Middlewares\AuthMiddleware;
 use Php\Mvc\App\Http\Middlewares\JsonMiddleware;
 use Php\Mvc\App\Http\Middlewares\ModifyRequestHeader;
 use Php\Mvc\App\Http\Middlewares\SensorBadWords;
+use Php\Mvc\App\Http\Middlewares\SetRequestClassDataSource;
 use Php\Mvc\App\Http\Middlewares\SetRequestData;
 use Php\Mvc\App\Http\Middlewares\TransformsResponse;
 use Php\Mvc\App\Http\Middlewares\XPoweredByMiddleware;
 
-class Kernel extends CoreKernel {
+class Kernel extends CoreKernel
+{
 
 
-    protected $middleware = [
-      XPoweredByMiddleware::class,
-      ModifyRequestHeader::class,
+  protected $middleware = [
+    XPoweredByMiddleware::class,
+    ModifyRequestHeader::class,
       // AddDetailsToRequest::class,
-      // SensorBadWords::class,
-      SetRequestData::class,
+    SetRequestClassDataSource::class,
+    SetRequestData::class,
       // AuthMiddleware::class,
-      TransformsResponse::class,
-      
-    ];
+      // SensorBadWords::class,
+    TransformsResponse::class,
 
-    protected $middlewareGroups = [
-      'web' => [
+  ];
+
+  protected $middlewareGroups = [
+    'web' => [
 
 
-      ],
-      'api' => [
-        JsonMiddleware::class,
+    ],
+    'api' => [
+      JsonMiddleware::class,
 
-      ] 
-    ];
+    ]
+  ];
 
 }

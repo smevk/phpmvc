@@ -2,13 +2,11 @@
 
 namespace Php\Mvc\App\Http\Middlewares;
 
-use Php\Mvc\App\Http\Services\Response;
 
 class TransformsResponse implements Middleware
 {
     public function handle($request, $response, $next)
     {
-       
         $next($request,$response);
         // Check if the response content is an array or object
         $content = $response->getContent();
@@ -21,7 +19,8 @@ class TransformsResponse implements Middleware
         }
 
         // Return the response object with the updated content and headers
-        return $response;
+        // passign updated request and response
+        return [$request,$response];  
         // return $next($request,$response);
     }
 }

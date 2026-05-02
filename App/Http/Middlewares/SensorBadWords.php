@@ -4,15 +4,19 @@ namespace Php\Mvc\App\Http\Middlewares;
 class SensorBadWords implements Middleware{
 
     public function handle($request, $response, $next){
-
-        // Call the next middleware or controller action
-        $response = $next($request, $response);
+        
+        
+        // $request = $middlewareCall[0];
+        // $response = $middlewareCall[1];
         // Sensor request data       
         $this->sensorRequestData($request);
         // Sensor response data
         $this->sensorResponseData($response);
 
-        return $response;
+        // passign updated request and response
+        $next($request,$response);
+        return [$request,$response];   
+
     }
 
 
@@ -27,7 +31,7 @@ class SensorBadWords implements Middleware{
     }
 
     public function sensorResponseData($response){
-        $responseData = $response->getContent();
+        $responseData = @$response->getContent();
         foreach ($this->badWords() as $key => $value) {
             $responseData = @str_replace($key, $value, $responseData);
         }

@@ -9,7 +9,6 @@ class CheckRequestType implements Middleware
 {
     public function handle($request, $response, $next)
     {
-        $next($request,$response);
         // Get the Accept header value
         $acceptHeader = $request->header('Accept');
         // Check if the request is an API request based on the Accept header
@@ -22,6 +21,9 @@ class CheckRequestType implements Middleware
 
         }
 
-        return $response;
+        // passign updated request and response
+        $next($request,$response);
+        return [$request,$response];   
+
     }
 }

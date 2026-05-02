@@ -16,7 +16,8 @@ class AuthMiddleware
             return $response;
         }
 
-        // If the user is authenticated, call the next middleware
-        return $next($request, $response);
+        // passign updated request and response
+        $next($request,$response);
+        return [$request,$response];  
     }
 }

@@ -14,6 +14,7 @@ abstract class UrlParser {
     public static $baseUrl;
     public static $https;
     public static $contentType;
+    public static $urlWithoutParam;
 
     public static function parseUrl() {
         self::$basePath = $_SERVER['REQUEST_URI'];
@@ -29,6 +30,7 @@ abstract class UrlParser {
         self::$fullUrl = (self::$https == 'on'? 'https://' : 'http://').self::$baseUrl.self::$basePath;
         self::$url = (self::$https == 'on'? 'https://' : 'http://').self::$baseUrl;
         self::$contentType = $_SERVER['CONTENT_TYPE'] ?? "";
+        self::$urlWithoutParam = strtok(self::$fullUrl, '?');
     }
 }
   

@@ -7,11 +7,13 @@ class XPoweredByMiddleware implements Middleware
 {
     public function handle($request,Response $response, $next)
     {
-        $next($request,$response);
         // Set the X-Powered-By header
         $response->setHeader('X-Powered-By', 'My Awesome MVC');
 
         // Call the next middleware in the chain
-        return $response;
+        // passign updated request and response
+        $next($request,$response);
+        return [$request,$response];   
+
     }
 }

@@ -2,26 +2,33 @@
 namespace Php\Mvc\App\Http\Services;
 
 use Php\Mvc\App\Core\UrlParser;
-
-class Request {
+#[\AllowDynamicProperties]
+class Request
+{
     private $attributes = [];
     private $headers = [];
-  
+    public $FILES;
+    public $POST;
+    public $QUERYPARAMS;
 
-    public function setAttribute($name, $value) {
-            if (array_key_exists($name, $this->attributes)) {
+
+    public function setAttribute($name, $value)
+    {
+        var_dump($name);
+        if (array_key_exists($name, $this->attributes)) {
             // Update the existing attribute
-                $this->attributes[$name] = $value;
-                $this->$name = $value;
-            } else {
-                // Add a new attribute
-                $this->attributes[$name] = $value;
-                $this->$name = $value;
-            }
+            $this->attributes[$name] = $value;
+            $this->$name = $value;
+        } else {
+            // Add a new attribute
+            $this->attributes[$name] = $value;
+            $this->$name = $value;
+        }
 
     }
 
-    public function __get($key) {
+    public function __get($key)
+    {
         if (array_key_exists($key, $this->attributes)) {
             return $this->attributes[$key];
         }
@@ -30,31 +37,43 @@ class Request {
 
 
     // below methods are just for utilitly purpose
-        
-    public function getAttribute($name) {
+
+    public function getAttribute($name)
+    {
         return $this->attributes[$name] ?? null;
     }
 
-    public function get($name) {
+    public function get($name)
+    {
         return $this->getAttribute($name);
     }
- 
-    public function getAllData(){
+
+    public function getAllData()
+    {
         return $this->attributes;
     }
 
-    public function setAllData(array $data){
+    public function setAllData(array $data)
+    {
         $this->attributes = $data;
     }
-    public function requestFiles(){
+
+    public function requestFiles()
+    {
         return $_FILES ?? NULL;
     }
-
-    public function queryParams(){
-        return UrlParser::$params ?? null;
-        
+    public function requstPost()
+    {
+        return $_POST ?? NULL;
     }
-    function getHeaders() {
+
+    public function queryParams()
+    {
+        return UrlParser::$params ?? null;
+
+    }
+    function getHeaders()
+    {
         if (function_exists('getallheaders')) {
             return getallheaders();
         } else {
@@ -68,12 +87,14 @@ class Request {
         }
     }
 
-    public function setHeader($name, $value) {
+    public function setHeader($name, $value)
+    {
         $this->headers[strtolower($name)] = $value;
     }
 
 
-    public static function createFromGlobals() {
+    public static function createFromGlobals()
+    {
         $method = $_SERVER['REQUEST_METHOD'];
         $uri = $_SERVER['REQUEST_URI'];
         $queryParams = $_GET;
@@ -82,10 +103,11 @@ class Request {
         return new Request($method, $uri, $queryParams, $headers, $body);
     }
 
-   
 
-    public function header($header) {
+
+    public function header($header)
+    {
         $headers = $this->getHeaders();
         return $headers[$header] ?? null;
-    }   
+    }
 }

@@ -10,7 +10,7 @@ class Route {
     public static $routeGroup;
 
   
-    public static function dispatch($uri,$method,$queryParams,$request) {
+    public static function dispatch($uri,$method,$request,$container) {
         // Loop through each route in $routeArray
         foreach (self::$routeArray as $route) {
             // checking if method is same or not
@@ -19,20 +19,8 @@ class Route {
              $pattern = preg_replace('/\{([a-zA-Z0-9_]+)\}/', '(?P<$1>[^\/]+)', $pattern);
             // Check if the requested URI matches the pattern
             if (preg_match($pattern, $uri, $matches) && $method === $route['method']) {
-
-               
-                
-                // processing query param in url and input and wild card
-                RouteServices::processRequestFormInputAndQueryParams($request,$matches,$queryParams);
-
-                // processing file uploads
-                // RouteServices::processRequestFilesUpload($request);
-            
-
                 // Call the corresponding action for that route
-               return self::callClassAndMethod($route,$request);
-                
-                // return true;
+               return self::callClassAndMethod($route,$container,$request,$matches);
             }
 
         }
@@ -42,11 +30,20 @@ class Route {
     }
 
 
-    public static function callClassAndMethod($route,$request){
+    public static function callClassAndMethod($route,$container,$request,$matches){
         $action = $route['action'];
-        $controller = new $action[0]();
+        $controller =  $action[0];
         $method = $action[1];
-       return $controller->$method($request);
+        $paramsArray = [];
+        foreach ($matches as $key => $value) {
+            if (is_string($key)) {
+                $paramsArray[$key] = $value;
+                // $request->setAttribute($key, $value);
+            }        
+        }
+        $dependencies = $container->resolveMethodDependencies($controller, $method,$paramsArray);
+        $instance = $container->make($controller);
+        return $container->resolveMethod($instance, $method,$dependencies);
     }
   
     

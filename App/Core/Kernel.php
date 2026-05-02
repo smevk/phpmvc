@@ -9,26 +9,27 @@ use Php\Mvc\App\Http\Services\Route;
 class Kernel {
     protected $middleware = [];
     protected $middlewareGroups = [];
-    protected $isRouteCalled = false; //route in this class is called multiple for some reason so we check it here
-    protected $responseArray  = [];
+    // protected $isRouteCalled = false; //route in this class is called multiple for some reason so we check it here
     
 
-    public function handle($request)
+    public function handle($request,$container)
     {
 
         
-        $response = new Response();
+        $response = $container->make(Response::class);
        
-        // Create a new Response object
-        
-            // Set up the initial middleware to call
-            $next = function ($request, $response) {
-                // If there are no more middleware to call, return the response
-                $this->route($request,$response);
-            };
+   
+        $checkRequestType = new CheckRequestType();
 
-           
-        $this->callMiddlewareExemptedFromMiddleWareArray($request,$response);
+        // Create a new closure that calls the handle method of CheckRequestType middleware and passes in a closure that calls the first middleware in the chain
+        $next = function ($request, $response) use ($checkRequestType,$container) {
+            return $checkRequestType->handle($request, $response, function ($request, $response) use($container) {
+                // If there are no more middleware to call, return the response
+                return $this->route($request,$response,$container);
+            });
+        };
+
+        
         // merging groups middleware into middleware array so that 
         // we will lopp thorugh each middleware and call them
 
@@ -42,42 +43,44 @@ class Kernel {
         }
 
         
+        // calling middlwares one by one in loop    
         foreach ($middlewareStack as $middleware) {
-            $middlewareInstance = new $middleware();
-            
+            $middlewareInstance = new $middleware();            
             $next = function ($request, $response) use ($middlewareInstance, $next) {
-                return $middlewareInstance->handle($request, $response, $next);
-            };
+                    return $middlewareInstance->handle($request, $response,function($request,$response) use ($next){
+                        return $next($request, $response);
+                    });
+                };
+
         }
+
+
 
     
         // Call the first middleware, which will in turn call the next middleware, etc.
-         return $next($request,$response);
+        
+        $next($request,$response);
         
         
-        // return $response;
+        return [$request,$response];
     }
     
-    private function route($request,&$response)
+    private function route($request,$response,$container)
     {
 
     // Dispatch the request using the Route class
         try {
-            if ($this->isRouteCalled) {
-                return;
-            }
-        
-            $this->isRouteCalled = true;
-        
-            $data = Route::dispatch(UrlParser::$path,UrlParser::$requestMethod,UrlParser::$params,$request);
+
+            $data = Route::dispatch(UrlParser::$path,UrlParser::$requestMethod,$request,$container);
             $response->setContent($data);
+            return [$request,$response];
 
         } catch (Exception $e) {
             $response = new Response();
             $response->setStatusCode(404);
-            $response->setContent('Not Found');
+            $response->setContent($e);
             $response->send();
-            return $response;
+            return [$request,$response];
             die();
         
         }
@@ -85,20 +88,4 @@ class Kernel {
     }
 
 
-    public function callMiddlewareExemptedFromMiddleWareArray($request,&$response){
-        // this method is just to call teh checkrequtype middlware
-        // Create a new instance of CheckRequestType middleware
-        $checkRequestType = new CheckRequestType();
-
-        // Create a new closure that calls the handle method of CheckRequestType middleware and passes in a closure that calls the first middleware in the chain
-        $next = function ($request, $response) use ($checkRequestType) {
-            return $checkRequestType->handle($request, $response, function ($request, $response) {
-                // If there are no more middleware to call, return the response
-                return $this->route($request,$response);
-            });
-        };
-         $next($request, $response);
-
-         
-         }
 }
